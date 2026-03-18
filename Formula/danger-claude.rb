@@ -1,11 +1,7 @@
-# Documentation: https://docs.brew.sh/Formula-Cookbook
-#                https://docs.brew.sh/rubydoc/Formula
-# PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
 class DangerClaude < Formula
   desc "Run Claude Code CLI as a non-root user with sandboxed permissions"
   homepage "https://github.com/moduloTech/danger-claude"
   url "https://github.com/moduloTech/danger-claude/archive/refs/tags/v0.0.2.tar.gz"
-  version "0.0.2"
   sha256 "accd46e80ac4ff76fe4662ff191a6118e1b1598bbf44295eb928497917f9d3e6"
   license :cannot_represent
 
