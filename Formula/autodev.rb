@@ -5,6 +5,8 @@ class Autodev < Formula
   sha256 "1c2e76df9518b1c17b9c8ac0c7594dd9f6ee7ba714fc5fbdd0f2bf64268c9812"
   license :cannot_represent
 
+  depends_on "modulotech/tap/danger-claude"
+  depends_on "modulotech/tap/mr-review"
   depends_on "ruby"
 
   def install
