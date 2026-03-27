@@ -11,6 +11,7 @@ class Autodev < Formula
 
   def install
     bin.install "bin/autodev"
+    prefix.install "lib"
   end
 
   test do
