@@ -15,6 +15,6 @@ class Autodev < Formula
   end
 
   test do
-    assert_match "usage", shell_output("#{bin}/autodev --help", 2).downcase
+    assert_match "autodev #{version}", shell_output("#{bin}/autodev --version")
   end
 end
