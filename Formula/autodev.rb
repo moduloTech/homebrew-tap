@@ -1,8 +1,8 @@
 class Autodev < Formula
   desc "Automated GitLab issue implementation via danger-claude"
   homepage "https://github.com/moduloTech/autodev"
-  url "https://github.com/moduloTech/autodev/archive/refs/tags/v0.9.0.tar.gz"
-  sha256 "a3f40cfd35c118461acd49a01c64d9c2f3c38d3a47feff3840e0a2df794b18d9"
+  url "https://github.com/moduloTech/autodev/archive/refs/tags/v0.9.1.tar.gz"
+  sha256 "70bbc3e3ffd1363e70b5772abb3540a7c796508ea105e51f02e8b20bc9ca1478"
   license :cannot_represent
 
   depends_on "modulotech/tap/danger-claude"
