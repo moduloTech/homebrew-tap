@@ -1,8 +1,8 @@
 class MrReview < Formula
   desc "Automated GitLab Merge Request review via Claude Code"
   homepage "https://github.com/moduloTech/mr-review"
-  url "https://github.com/moduloTech/mr-review/archive/refs/tags/v0.3.1.tar.gz"
-  sha256 "6f6af36329576067cf0732a9cb8e7ea33a3d4732bf9ea4e289c9718cb5fa8664"
+  url "https://github.com/moduloTech/mr-review/archive/refs/tags/v0.3.2.tar.gz"
+  sha256 "7163bb0cc32d86aaed883568e4a4bee582b7ea1b0860b17ad6a2f105a3aaa3c0"
   license :cannot_represent
 
   depends_on "ruby"
