@@ -1,8 +1,8 @@
 class IssueMd < Formula
   desc "Export a GitLab issue as clean Markdown"
   homepage "https://github.com/moduloTech/issue-md"
-  url "https://github.com/moduloTech/issue-md/archive/refs/tags/v0.1.1.tar.gz"
-  sha256 "2a7c9b87af62b3331bfaace7ffa615675f0af19834fb76ae12851d243e6b9d6b"
+  url "https://github.com/moduloTech/issue-md/archive/refs/tags/v0.2.0.tar.gz"
+  sha256 "f88244170b57b1b15aa52e28571816f3bea96792d8236987fa68f8b2b5aa2351"
   license :cannot_represent
 
   depends_on "ruby"
