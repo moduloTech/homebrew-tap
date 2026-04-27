@@ -1,8 +1,8 @@
 class DangerClaude < Formula
   desc "Run Claude Code CLI as a non-root user with sandboxed permissions"
   homepage "https://github.com/moduloTech/danger-claude"
-  url "https://github.com/moduloTech/danger-claude/archive/refs/tags/v0.5.4.tar.gz"
-  sha256 "66f2c9399940162e8ba75584e5480651496fa8575074cbcaafc3bb69802a7d8c"
+  url "https://github.com/moduloTech/danger-claude/archive/refs/tags/v0.5.5.tar.gz"
+  sha256 "1a221244389a77c39a49497d84afd615460a71a04be3b2d43f55b696d6cfb2d9"
   license :cannot_represent
 
   depends_on "ruby"
