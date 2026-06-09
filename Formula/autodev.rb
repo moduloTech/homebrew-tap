@@ -5,7 +5,7 @@ class Autodev < Formula
   version "1.0.0-alpha.1"
   sha256 "5fa00767f0e7d9c24f1e167717c205b4f8646aa12785fe3b1f62943465395121"
   license :cannot_represent
-  revision 2
+  revision 3
 
   depends_on "modulotech/tap/danger-claude"
   depends_on "modulotech/tap/mr-review"
@@ -40,22 +40,26 @@ class Autodev < Formula
     # exec's libexec/bin/autodev. Child processes spawned by the autodev
     # supervisor (bin/rails server + bin/jobs) inherit the env, so their
     # own `#!/usr/bin/env ruby` shebangs also resolve to Brew's Ruby.
-    # PATH composition:
+    # PATH composition for the wrapper:
     #   Formula["ruby"].opt_bin  — Brew Ruby first (ABI pin, see above).
     #   HOMEBREW_PREFIX/bin      — danger-claude, mr-review, sqlite, etc.
-    #                              autodev's bootstrap shells out to
-    #                              `which danger-claude` and `which mr-review`,
-    #                              so they must be visible. Under launchd
-    #                              (`brew services start`), the inherited
-    #                              $PATH is minimal — we can't rely on the
-    #                              user's shell rcs putting Brew on PATH.
-    #   /usr/bin:/bin            — system tools (git, sh, ssh) that the
-    #                              workflow classes call out to.
+    #   HOMEBREW_PREFIX/sbin     — same family, less-common tools.
+    #   /usr/local/bin           — Docker Desktop's symlink (lives here
+    #                              even on Apple Silicon), legacy x86 Brew.
+    #   /usr/local/sbin
+    #   /usr/bin:/usr/sbin:/bin:/sbin — system tools (git, sh, ssh, env, ...).
     #   $PATH                    — preserved last so foreground invocations
     #                              still see whatever the user had in scope.
+    #
+    # Under launchd (`brew services start`) the inherited $PATH is
+    # minimal — we can't rely on the user's shell rcs putting anything
+    # on PATH — so the wrapper has to cover every directory the
+    # workflow classes might shell out to (docker, gh, jq, ...). The
+    # set above is what's reachable on a stock macOS + Brew + Docker
+    # Desktop install.
     (bin/"autodev").write <<~SH
       #!/bin/bash
-      export PATH="#{Formula["ruby"].opt_bin}:#{HOMEBREW_PREFIX}/bin:/usr/bin:/bin:$PATH"
+      export PATH="#{Formula["ruby"].opt_bin}:#{HOMEBREW_PREFIX}/bin:#{HOMEBREW_PREFIX}/sbin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH"
       exec "#{libexec}/bin/autodev" "$@"
     SH
     (bin/"autodev").chmod 0o755
