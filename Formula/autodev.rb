@@ -5,6 +5,7 @@ class Autodev < Formula
   version "1.0.0-alpha.1"
   sha256 "5fa00767f0e7d9c24f1e167717c205b4f8646aa12785fe3b1f62943465395121"
   license :cannot_represent
+  revision 1
 
   depends_on "modulotech/tap/danger-claude"
   depends_on "modulotech/tap/mr-review"
@@ -15,7 +16,7 @@ class Autodev < Formula
     # autodev is a Rails 8 application as of v1.0.0-alpha.1, not a single
     # bundler/inline script. Install the whole repo into libexec, run
     # `bundle install --deployment` to materialise vendor/bundle/, then
-    # expose `bin/autodev` via a symlink in Brew's bin/.
+    # expose `bin/autodev` via a shell wrapper in Brew's bin/.
     libexec.install Dir["*"]
 
     cd libexec do
@@ -27,10 +28,32 @@ class Autodev < Formula
       system "bundle", "install", "--jobs", "4", "--retry", "3"
     end
 
-    # The symlinked `autodev` resolves __FILE__ → __dir__ to libexec/bin/,
-    # so `require_relative '../config/environment'` and `../Gemfile`
-    # land in the right place.
-    bin.install_symlink libexec/"bin/autodev"
+    # We CANNOT use `bin.install_symlink libexec/"bin/autodev"`. The
+    # symlinked entry resolves `#!/usr/bin/env ruby` against PATH at run
+    # time — on a machine with mise / rbenv / asdf shimming Ruby ahead of
+    # /opt/homebrew/opt/ruby/bin, the script picks up a different Ruby
+    # than the one `bundle install` linked the native gems against
+    # (sqlite3.bundle, date.bundle, etc.), and Rails dies with
+    # "linked to incompatible libruby.X.Y.dylib".
+    #
+    # Instead, write a shell wrapper that pins Brew's Ruby on PATH and
+    # exec's libexec/bin/autodev. Child processes spawned by the autodev
+    # supervisor (bin/rails server + bin/jobs) inherit the env, so their
+    # own `#!/usr/bin/env ruby` shebangs also resolve to Brew's Ruby.
+    (bin/"autodev").write <<~SH
+      #!/bin/bash
+      export PATH="#{Formula["ruby"].opt_bin}:$PATH"
+      exec "#{libexec}/bin/autodev" "$@"
+    SH
+    (bin/"autodev").chmod 0o755
+  end
+
+  service do
+    run opt_bin/"autodev"
+    keep_alive crashed: true
+    log_path "#{Dir.home}/.autodev/log/autodev-stdout.log"
+    error_log_path "#{Dir.home}/.autodev/log/autodev-stderr.log"
+    working_dir Dir.home
   end
 
   def caveats
@@ -45,6 +68,14 @@ class Autodev < Formula
         ~/.autodev/tmp/               Rails tmp
 
       Set AUTODEV_HOME to relocate everything (e.g. for a service account).
+
+      Start in the background:
+        brew services start autodev      # supervised via launchd
+        autodev                          # foreground in this shell
+
+      The Ruby that runs autodev is `brew --prefix ruby`'s, NOT mise/rbenv/asdf
+      — the bundler installed native gems against that ABI and a mismatch is
+      fatal. The shell wrapper at #{HOMEBREW_PREFIX}/bin/autodev pins it.
     EOS
   end
 
