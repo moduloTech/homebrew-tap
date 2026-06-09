@@ -5,7 +5,7 @@ class Autodev < Formula
   version "1.0.0-alpha.1"
   sha256 "5fa00767f0e7d9c24f1e167717c205b4f8646aa12785fe3b1f62943465395121"
   license :cannot_represent
-  revision 1
+  revision 2
 
   depends_on "modulotech/tap/danger-claude"
   depends_on "modulotech/tap/mr-review"
@@ -40,9 +40,22 @@ class Autodev < Formula
     # exec's libexec/bin/autodev. Child processes spawned by the autodev
     # supervisor (bin/rails server + bin/jobs) inherit the env, so their
     # own `#!/usr/bin/env ruby` shebangs also resolve to Brew's Ruby.
+    # PATH composition:
+    #   Formula["ruby"].opt_bin  — Brew Ruby first (ABI pin, see above).
+    #   HOMEBREW_PREFIX/bin      — danger-claude, mr-review, sqlite, etc.
+    #                              autodev's bootstrap shells out to
+    #                              `which danger-claude` and `which mr-review`,
+    #                              so they must be visible. Under launchd
+    #                              (`brew services start`), the inherited
+    #                              $PATH is minimal — we can't rely on the
+    #                              user's shell rcs putting Brew on PATH.
+    #   /usr/bin:/bin            — system tools (git, sh, ssh) that the
+    #                              workflow classes call out to.
+    #   $PATH                    — preserved last so foreground invocations
+    #                              still see whatever the user had in scope.
     (bin/"autodev").write <<~SH
       #!/bin/bash
-      export PATH="#{Formula["ruby"].opt_bin}:$PATH"
+      export PATH="#{Formula["ruby"].opt_bin}:#{HOMEBREW_PREFIX}/bin:/usr/bin:/bin:$PATH"
       exec "#{libexec}/bin/autodev" "$@"
     SH
     (bin/"autodev").chmod 0o755
