@@ -21,6 +21,12 @@ class Autodev < Formula
     cd libexec do
       ENV["BUNDLE_GEMFILE"] = "#{libexec}/Gemfile"
       ENV.delete("RUBYOPT") # avoid pulling in bundler from outside
+      # Homebrew's superenv sets BUNDLE_FORCE_RUBY_PLATFORM=true for every
+      # formula build since 04/09/2026 (Homebrew commit 165e7513c1). The
+      # lockfile lists native platforms only (arm64-darwin among them), so a
+      # forced `ruby` platform makes `bundle install` refuse outright. Native
+      # gems install from their precompiled arm64-darwin builds, as before.
+      ENV.delete("BUNDLE_FORCE_RUBY_PLATFORM")
       system "bundle", "config", "set", "--local", "path", "vendor/bundle"
       system "bundle", "config", "set", "--local", "deployment", "true"
       system "bundle", "config", "set", "--local", "without", "development:test"
